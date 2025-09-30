@@ -1,0 +1,44 @@
+/* Full-screen subtle animated background text */
+.bgMarquee {
+  position: absolute; /* scoped to parent section */
+  inset: 0;
+  z-index: 0; /* behind section content */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Create a soft fade on edges so the text blends in */
+.bgMarquee {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.8) 10%, rgba(0,0,0,0.8) 90%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.8) 10%, rgba(0,0,0,0.8) 90%, transparent 100%);
+}
+
+.track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  display: inline-flex;
+  gap: 4rem;
+  animation: marquee 30s linear infinite;
+  opacity: 0.05; /* very subtle */
+}
+
+.track span {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: clamp(2.5rem, 10vw, 6rem);
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+/* Motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .track { animation: none; }
+}
+
+@keyframes marquee {
+  0% { transform: translateY(-50%) translateX(0); }
+  100% { transform: translateY(-50%) translateX(-50%); }
+}
