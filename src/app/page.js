@@ -85,18 +85,40 @@ export default function Home() {
   // Cleanup everything properly
   return () => {
     aboutObserver.disconnect()
-    observer.disconnect()
     window.removeEventListener("scroll", handleScroll)
   }
 }, [])
 
 
+  const closeWithAnimation = () => {
+    const navEl = document.getElementById('primary-navigation') || document.querySelector('.nav')
+    if (navEl && navEl.classList.contains('active')) {
+      // Add a closing class so CSS can animate slide-out while visible
+      navEl.classList.add('closing')
+      setIsMenuOpen(false)
+      const onEnd = () => {
+        navEl.classList.remove('closing')
+      }
+      // Use transitionend with a fallback timeout
+      navEl.addEventListener('transitionend', onEnd, { once: true })
+      setTimeout(onEnd, 600)
+      return true
+    }
+    return false
+  }
+
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
+    if (isMenuOpen) {
+      closeWithAnimation()
+    } else {
+      setIsMenuOpen(true)
+    }
   }
 
   const closeMenu = () => {
-    setIsMenuOpen(false)
+    if (!closeWithAnimation()) {
+      setIsMenuOpen(false)
+    }
   }
 
   // Add scrolled header effect
@@ -105,6 +127,9 @@ export default function Home() {
     if (!headerEl) return
     if (window.scrollY > 10) headerEl.classList.add("scrolled")
     else headerEl.classList.remove("scrolled")
+
+    // If sidebar/menu is open, close it on scroll (mobile/desktop)
+    closeWithAnimation()
 
     // Toggle back-to-top visibility
     const backTop = document.querySelector('.back-to-top')
@@ -154,7 +179,7 @@ export default function Home() {
 
       {/* Subtle animated background watermark scoped to hero */}
 
-      <div className="portfolio-container page-fade-in">
+      <div className="portfolio-container">
       <header className="header">
         <div className="logo">
           Kelechi <span>Timothy</span>
@@ -197,23 +222,23 @@ export default function Home() {
         </nav>
       </header>
 
-      <main>
+      <main className="page-fade-in">
         <section className="hero" id="home">
           {/* Ticker-like background watermark within hero */}
           <div className={styles.bgMarquee} aria-hidden="true">
             <div className={styles.track}>
-              <span>KELECHI</span>
-              <span>KELECHI</span>
-              <span>KELECHI</span>
-              <span>KELECHI</span>
-              <span>KELECHI</span>
-              <span>KELECHI</span>
-              <span>KELECHI</span>
-              <span>KELECHI</span>
-              <span>KELECHI</span>
-              <span>KELECHI</span>
-              <span>KELECHI</span>
-              <span>KELECHI</span>
+              <span>KELECHI .</span>
+              <span>KELECHI .</span>
+              <span>KELECHI .</span>
+              <span>KELECHI .</span>
+              <span>KELECHI .</span>
+              <span>KELECHI .</span>
+              <span>KELECHI .</span>
+              <span>KELECHI .</span>
+              <span>KELECHI .</span>
+              <span>KELECHI .</span>
+              <span>KELECHI .</span>
+              <span>KELECHI .</span>
             </div>
           </div>
           <div className="hero-content">
@@ -318,11 +343,11 @@ export default function Home() {
                     <div className="project-info">
                       <h3>Furniture E-commerce</h3>
                       <p>Modern furniture website with shopping cart and payment integration</p>
-                      <div className="project-tech">
+                      {/* <div className="project-tech">
                         <span>React</span>
                         <span>Node.js</span>
                         <span>MongoDB</span>
-                      </div>
+                      </div> */}
                       <div className="project-links">
                         <a
                           href="https://responsive-furniture-website1.vercel.app/"
@@ -332,7 +357,7 @@ export default function Home() {
                         >
                           <i className="bx bx-link-external"></i> Live Demo
                         </a>
-                        <a href="#" className="btn-link">
+                        <a href="https://github.com/Kelechi-6/Furniture.git" target="_blank" className="btn-link">
                           <i className="bx bxl-github"></i> Code
                         </a>
                       </div>
@@ -348,11 +373,11 @@ export default function Home() {
                     <div className="project-info">
                       <h3>Multi-vendor Marketplace</h3>
                       <p>Full-featured e-commerce platform with vendor management</p>
-                      <div className="project-tech">
+                      {/* <div className="project-tech">
                         <span>Next.js</span>
                         <span>Express</span>
                         <span>PostgreSQL</span>
-                      </div>
+                      </div> */}
                       <div className="project-links">
                         <a
                           href="https://multi-vendor-marketplace-sand.vercel.app/"
@@ -362,7 +387,7 @@ export default function Home() {
                         >
                           <i className="bx bx-link-external"></i> Live Demo
                         </a>
-                        <a href="#" className="btn-link">
+                        <a href="https://github.com/Kelechi-6/Multi-Vendor-Marketplace.git" target="_blank" className="btn-link">
                           <i className="bx bxl-github"></i> Code
                         </a>
                       </div>

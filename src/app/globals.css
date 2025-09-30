@@ -185,13 +185,21 @@ p {
   justify-content: space-evenly;
   align-items: center;
   z-index: 1000;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Limit transitions to non-layout props to prevent apparent movement */
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  /* Stabilize fixed header on mobile Safari and low-end GPUs */
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Compact style when user scrolls */
 .header.scrolled {
-  padding: 0.5rem 4%;
+  padding: 0.8rem 4%; /* keep constant height to avoid jump */
   background: rgba(10, 10, 10, 0.98);
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
 }
@@ -334,10 +342,14 @@ p {
 @media (max-width: 768px) {
   .header {
     padding: 0.8rem 1.5rem;
+    /* Disable blur on mobile to avoid scroll jitter; use solid translucent bg */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(10, 10, 10, 0.98);
   }
   
   .header.scrolled {
-    padding: 0.5rem 1.5rem;
+    padding: 0.8rem 1.5rem; /* keep constant height on scroll */
   }
   
   .logo {
@@ -371,6 +383,14 @@ p {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+  }
+
+  /* Animate slide-out on close */
+  .nav.closing {
+    transform: translateX(100%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
   
   .nav-links {
@@ -811,10 +831,16 @@ section {
   
   .project-card {
     max-width: 100%;
+    overflow: visible; /* ensure child overlay/content can expand */
   }
   
   .project-image {
-    height: 200px;
+    height: auto; /* let image/overlay size naturally on mobile */
+  }
+  .project-image img {
+    width: 100%;
+    height: auto; /* ensure full image is visible without cropping */
+    object-fit: cover;
   }
   
   .project-info {
@@ -824,10 +850,39 @@ section {
   .project-info h3 {
     font-size: 1.3rem;
   }
+
+  /* Remove desktop clamps so content shows fully on mobile */
+  .project-info p {
+    max-height: none;
+    overflow: visible;
+    text-overflow: unset;
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+  }
+  .project-tech {
+    max-height: none;
+  }
   
   .btn-link {
     padding: 0.6rem 1.2rem;
     min-width: 100px;
+  }
+
+  /* Make the hover overlay content always visible on touch devices */
+  .project-overlay {
+    position: static;
+    width: 100%;
+    height: auto;
+    opacity: 1;
+    transform: none;
+    background: transparent;
+    padding: 1rem 0;
+  }
+
+  /* Disable hover zoom on mobile for stability */
+  .project-card:hover .project-image img {
+    transform: none;
   }
 }
 /* Skills Section */
@@ -1026,12 +1081,13 @@ section {
 /* Animations */
 /* Page and loader transitions */
 .page-fade-in {
-  animation: pageFadeIn 400ms ease both;
+  /* Avoid transforms here; transforms create a containing block for fixed */
+  animation: pageFadeIn 350ms ease both;
 }
 
 @keyframes pageFadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .loader-overlay.loader-exit {
@@ -1122,13 +1178,19 @@ section {
     background: rgba(10, 10, 10, 0.95);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.25s ease;
     transform: translateX(100%);
     z-index: 1000;
   }
 
   .nav.active {
     transform: translateX(0);
+    opacity: 1;
+  }
+
+  .nav.closing {
+    transform: translateX(100%);
+    opacity: 0;
   }
 
   /* Center social icons on mobile */
@@ -1228,6 +1290,9 @@ section {
 
   .header {
     padding: 1rem 3%;
+  }
+  .header.scrolled {
+    padding: 1rem 3%; /* keep constant height on scroll at very small widths */
   }
 }
 
