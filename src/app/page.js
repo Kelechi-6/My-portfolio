@@ -1,12 +1,13 @@
 "use client"
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import styles from "./BackgroundMarquee.module.css"
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("home")
-  const [loading, setLoading] = useState(true)
-  const [progress, setProgress] = useState(0)
+  const router = useRouter()
+  
 
   useEffect(() => {
   // About section observer
@@ -104,6 +105,13 @@ export default function Home() {
     if (!headerEl) return
     if (window.scrollY > 10) headerEl.classList.add("scrolled")
     else headerEl.classList.remove("scrolled")
+
+    // Toggle back-to-top visibility
+    const backTop = document.querySelector('.back-to-top')
+    if (backTop) {
+      if (window.scrollY > 300) backTop.classList.add('show')
+      else backTop.classList.remove('show')
+    }
   }
 
   useEffect(() => {
@@ -112,22 +120,22 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Simulated loading progress for the loader overlay
+  // On hard refresh of the homepage, show the loader page first
   useEffect(() => {
-    if (!loading) return
-    const interval = setInterval(() => {
-      setProgress((p) => {
-        const next = Math.min(100, p + Math.floor(Math.random() * 8) + 3)
-        if (next >= 100) {
-          clearInterval(interval)
-          // Delay a bit to show 100%
-          setTimeout(() => setLoading(false), 350)
-        }
-        return next
-      })
-    }, 200)
-    return () => clearInterval(interval)
-  }, [loading])
+    if (typeof window === 'undefined') return
+    // Only redirect if this was a real browser reload and we haven't shown the loader this session
+    const nav = performance.getEntriesByType('navigation')[0]
+    const isReload = !!nav && nav.type === 'reload'
+    const loaderShown = (() => {
+      try { return sessionStorage.getItem('loaderShown') === '1' } catch { return false }
+    })()
+    if (isReload && !loaderShown && window.location.pathname === '/') {
+      try { sessionStorage.setItem('loaderShown', '1') } catch {}
+      router.replace('/my-portfolio')
+    }
+  }, [router])
+
+  // Loader removed from homepage
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -135,34 +143,18 @@ export default function Home() {
     alert("Thank you for your message! I'll get back to you soon.")
   }
 
+  const scrollToTop = () => {
+    if (typeof window === 'undefined') return
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
     <>
-      {loading && (
-        <div className="loader-overlay" role="status" aria-live="polite">
-          <div className="loader-card">
-            <h1 className="loader-title">Portfolio<span className="loader-title-dot">.</span></h1>
-            <div className="loader-bar-row">
-              <span className="loader-label-left">Loading...</span>
-              <span className="loader-label-right">{progress}%</span>
-            </div>
-            <div className="loader-bar" aria-label="Loading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow={progress}>
-              <div className="loader-bar-fill" style={{ width: `${progress}%` }} />
-            </div>
-            <div className="loader-dots-row">
-              <div className="loader-dots" aria-hidden="true">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-              <p className="loader-subtext">Preparing your experience...</p>
-            </div>
-          </div>
-        </div>
-      )}
+      
 
       {/* Subtle animated background watermark scoped to hero */}
 
-      <div className="portfolio-container">
+      <div className="portfolio-container page-fade-in">
       <header className="header">
         <div className="logo">
           Kelechi <span>Timothy</span>
@@ -599,6 +591,16 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      
+      {/* Back to Top Button */}
+      <button
+        type="button"
+        className="back-to-top"
+        aria-label="Back to top"
+        onClick={scrollToTop}
+      >
+        ↑
+      </button>
     </div>
     </>
   )

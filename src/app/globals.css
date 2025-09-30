@@ -1,3 +1,11 @@
+/* Prevent horizontal scroll on any device */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+  overscroll-behavior-x: none; /* prevent sideways swipe bounce */
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -32,6 +40,39 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* Back to Top Button */
+.back-to-top {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 212, 255, 0.15);
+  color: #00d4ff;
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  box-shadow: 0 6px 16px rgba(0, 212, 255, 0.15);
+  cursor: pointer;
+  transition: opacity 0.25s ease, transform 0.25s ease, background 0.2s ease;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  z-index: 1100;
+}
+
+.back-to-top:hover {
+  background: rgba(0, 212, 255, 0.25);
+}
+
+.back-to-top.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .dark {
@@ -85,6 +126,13 @@ body {
 .portfolio-container {
   background-color: #0a0a0a;
   color: #fff;
+  overflow-x: hidden; /* guard container level */
+}
+
+/* Ensure media never causes horizontal overflow */
+img, video, svg, canvas {
+  max-width: 100%;
+  height: auto;
 }
 
 .container {
@@ -309,14 +357,20 @@ p {
     justify-content: flex-start;
     align-items: flex-start;
     padding: 5rem 2rem 2rem;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
     z-index: 1000;
     border-left: 1px solid rgba(255, 255, 255, 0.05);
     transform: translateX(100%); /* hidden off-canvas by default */
+    opacity: 0;                 /* prevent initial flash */
+    visibility: hidden;
+    pointer-events: none;
   }
   
   .nav.active {
     transform: translateX(0); /* slide in */
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
   }
   
   .nav-links {
@@ -970,6 +1024,25 @@ section {
 }
 
 /* Animations */
+/* Page and loader transitions */
+.page-fade-in {
+  animation: pageFadeIn 400ms ease both;
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.loader-overlay.loader-exit {
+  animation: loaderExit 450ms ease forwards;
+  pointer-events: none;
+}
+
+@keyframes loaderExit {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.98); }
+}
 @keyframes slideInLeft {
   from {
     opacity: 0;
