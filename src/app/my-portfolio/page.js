@@ -15,7 +15,10 @@ export default function LoaderPage() {
           clearInterval(interval)
           // Play a short exit animation before redirect
           setExiting(true)
-          setTimeout(() => router.replace("/"), 450)
+          setTimeout(() => {
+            try { sessionStorage.setItem('skipLoaderOnce', '1') } catch {}
+            router.replace("/?loaded=1")
+          }, 450)
         }
         return next
       })
