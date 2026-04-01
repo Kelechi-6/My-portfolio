@@ -272,7 +272,7 @@ export default function Home() {
               <div className="about-text">
                 <h3>Full Stack Developer & Problem Solver</h3>
                 <p>
-                  With over 3 years of experience in web development, I specialize in creating robust, scalable
+                  With over 2 years of experience in web development, I specialize in creating robust, scalable
                   applications using modern technologies. My journey began with a curiosity about how things work, which
                   led me to pursue programming as both a career and a passion.
                 </p>
@@ -283,11 +283,11 @@ export default function Home() {
                 </p>
                 <div className="stats">
                   <div className="stat">
-                    <h4>50+</h4>
+                    <h4>2+</h4>
                     <p>Projects Completed</p>
                   </div>
                   <div className="stat">
-                    <h4>3+</h4>
+                    <h4>2+</h4>
                     <p>Years Experience</p>
                   </div>
                   <div className="stat">
